@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LegendSharp.items
+namespace LegendItems
 {
     public class Item
     {
@@ -132,13 +132,13 @@ namespace LegendSharp.items
             }
         }
 
-        public static Item DecodeItem(BsonDocument itemDocument, Config config)
+        public static Item DecodeItem(BsonDocument itemDocument, Dictionary<String, BaseItem> baseItems)
         {
             String baseItemId = itemDocument.GetValue("base").AsString;
             BaseItem baseItem;
-            if (config.baseItems.ContainsKey(baseItemId))
+            if (baseItems.ContainsKey(baseItemId))
             {
-                baseItem = config.baseItems[baseItemId];
+                baseItem = baseItems[baseItemId];
             }
             else
             {
