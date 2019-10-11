@@ -1,5 +1,4 @@
-﻿using LegendSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,7 +9,6 @@ namespace LegendItems
         //Pretty Simple, For Now.
         public List<Item> items = new List<Item>();
 
-        public List<Game> openedBy = new List<Game>();
 
         public Guid guid;
 
@@ -26,14 +24,51 @@ namespace LegendItems
         
         public void AddItem(Item item, bool update = true)
         {
-            items.Add(item);
-            if (update)
+            if (item.GetMaxStack() > 1)
             {
-                foreach (Game game in openedBy)
+                for (int i = 0; i < items.Count; i++)
                 {
-                    game.AddToInventory(guid, item, items.Count - 1);
+                    if (items[i].Stackable(item) && items[i].GetQuantity() < items[i].GetMaxStack())
+                    {
+                        int addAmount = Math.Min(items[i].GetMaxStack() - items[i].GetQuantity(), item.GetQuantity());
+                        items[i].AddQuantity(addAmount);
+                        item.AddQuantity(-addAmount);
+                        if (update)
+                        {
+                            ItemModified?.Invoke(this, items[i], i);
+                        }
+                        if (item.GetQuantity() <= 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            if (item.GetQuantity() >= 1)
+            {
+                items.Add(item);
+                if (update)
+                {
+                    ItemAddedToInventory?.Invoke(this, item, items.Count - 1);
                 }
             }
         }
+
+        public void UpdateItem(Item item, int index, bool update = false)
+        {
+            items[index] = item;
+            if (update)
+            {
+                ItemModified?.Invoke(this, items[index], index);
+            }
+        }
+
+        public delegate void ItemAddedToInventoryHandler(Inventory inventory, Item item, int index);
+
+        public event ItemAddedToInventoryHandler ItemAddedToInventory;
+
+        public delegate void ItemModifiedHandler(Inventory inventory, Item item, int index);
+
+        public event ItemModifiedHandler ItemModified;
     }
 }

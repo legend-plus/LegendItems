@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,34 +11,16 @@ namespace LegendItems
         public String name;
         public String description;
         public String itemId;
+        public int maxStack;
 
-        public BaseItem(String sprite, String name, String description, String itemId, String type = "item")
+        public BaseItem(String sprite, String name, String description, String itemId, String type = "item", int maxStack = 1)
         {
             this.type = type;
             this.sprite = sprite;
             this.name = name;
             this.description = description;
             this.itemId = itemId;
-        }
-
-        public static BaseItem DecodeBaseItem(BsonDocument itemDocument, String itemId)
-        {
-            String itemType = itemDocument["item_type"].AsString;
-            String itemSprite = itemDocument["sprite"].AsString;
-            String itemName = itemDocument["name"].AsString;
-            String itemDescription = itemDocument["description"].AsString;
-
-            if (itemType == "weapon")
-            {
-                String weaponClass = itemDocument["weapon_class"].AsString;
-                double damage = itemDocument["damage"].AsDouble;
-                String damageType = itemDocument["damage_type"].AsString;
-                return new BaseWeapon(itemSprite, itemName, itemDescription, itemId, weaponClass, damage, damageType);
-            }
-            else
-            {
-                return new BaseItem(itemSprite, itemName, itemDescription, itemId, itemType);
-            }
+            this.maxStack = maxStack;
         }
     }
 }
